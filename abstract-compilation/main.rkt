@@ -32,28 +32,29 @@
     #:description "compilation clause"
     #:attributes (gen)
     (pattern [lhs:expr rhs:expr]
-             #:attr gen (λ _ #'[lhs rhs]))
-    (pattern [(~literal =>) (p:expr components:id ...) execution:expr
-              (~optional (~seq #:where [lhs:id rhs ...] ...)
+             #:attr gen (λ _ #`[lhs rhs]))
+    (pattern [(~literal =>) p:expr execution:expr
+              (~optional (~seq #:wtehere [lhs:id rhs ...] ...)
                          #:defaults ([(lhs 1) null]
                                      [(rhs 2) null]))
               (~optional (~seq #:recur q:pat ...)
                          #:defaults ([(q 1) null]))]
              #:attr gen
-             (λ (⟦_⟧)
+             (λ (⟦_⟧ comps)
                (with-syntax ([(def-⟦q⟧ ...)
                               (map (syntax-parser [q:pat ((attribute q.gen) ⟦_⟧)])
-                                   (syntax->list #'(q ...)))])
+                                   (syntax->list #'(q ...)))]
+                             [(components ...) comps])
                  #'[p
                     (define lhs rhs ...) ...
                     def-⟦q⟧ ...
                     (λ (components ...) execution)])))))
 
 (define-syntax-parser define-compiler
-  [(_ ⟦_⟧:id clauses:clause ...)
+  [(_ ((⟦_⟧:id e:id) components:id ...) clauses:clause ...)
    (with-syntax ([(compiled-clauses ...)
-                  (map (syntax-parser [c:clause ((attribute c.gen) #'⟦_⟧)])
+                  (map (syntax-parser [c:clause ((attribute c.gen) #'⟦_⟧ #'(components ...))])
                        (syntax->list #'(clauses ...)))])
-     #'(define ⟦_⟧
-         (match-lambda
+     #'(define (⟦_⟧ e)
+         (match e
            compiled-clauses ...)))])

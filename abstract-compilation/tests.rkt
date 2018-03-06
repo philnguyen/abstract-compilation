@@ -7,20 +7,20 @@
 (define-type Comp (ρ → Integer))
 
 (: ⟦_⟧ : Any → Comp)
-(define-compiler ⟦_⟧
+(define-compiler ((⟦_⟧ e) ρ)
   ;; e ::= x | ℤ | (+ e ...) | (- e ...) | (let ([x e]) e)
   [(? symbol? x) (intern x)]
   [(? exact-integer? n) (intern n)]
-  [=> (`(+ ,es ...) ρ)
+  [=> `(+ ,es ...)
       (for/sum ([f ⟦e⟧s]) (f ρ))
       #:recur [(es ...) #:as ⟦e⟧s]]
-  [=> (`(- ,e) ρ)
+  [=> `(- ,e)
       (- (⟦e⟧ ρ))
       #:recur e]
-  [=> (`(- ,e₁ ,es ...) ρ)
+  [=> `(- ,e₁ ,es ...)
       (- (⟦e₁⟧ ρ) (for/sum : Integer ([f ⟦es⟧]) (f ρ)))
       #:recur e₁ (es ...)]
-  [=> (`(let ([,(? symbol? x) ,eₓ]) ,e) ρ)
+  [=> `(let ([,(? symbol? x) ,eₓ]) ,e)
       (⟦e⟧ (hash-set ρ x (⟦eₓ⟧ ρ)))
       #:recur eₓ e])
 
