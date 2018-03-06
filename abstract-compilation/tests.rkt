@@ -35,10 +35,12 @@
 (require/typed racket/base
   [(eval eval1) (Sexp → Integer)])
 
-(for ([expr (list '(let ([x (+ 1 2)])
-                     (let ([y (- 1 2 3)])
-                       (+ x y)))
-                  '(let ([x (+ 42 43 2 3 5)])
-                     (let ([y (- x)])
-                       (- x y))))])
-  (check-equal? ((⟦_⟧ expr) (hasheq)) (eval1 expr)))
+(define-syntax-rule (check e) (check-equal? ((⟦_⟧ 'e) (hasheq)) e))
+
+(check (let ([x (+ 1 2)])
+         (let ([y (- 1 2 3)])
+           (+ x y))))
+
+(check (let ([x (+ 42 43 2 3 5)])
+         (let ([y (- x)])
+           (- x y))))
