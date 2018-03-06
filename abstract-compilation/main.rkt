@@ -19,7 +19,14 @@
     (pattern (x:id (~literal ...))
              #:attr gen
              (λ (⟦_⟧)
-               #`(define #,(format-id #'x "⟦~a⟧" #'x) (map #,⟦_⟧ x)))))
+               #`(define #,(format-id #'x "⟦~a⟧" #'x) (map #,⟦_⟧ x))))
+    (pattern (x:id #:as y:id)
+             #:attr gen
+             (λ (⟦_⟧) #`(define y (#,⟦_⟧ x))))
+    (pattern ((x:id (~literal ...)) #:as y:id)
+             #:attr gen
+             (λ (⟦_⟧)
+               #`(define y (map #,⟦_⟧ x)))))
   
   (define-syntax-class clause
     #:description "compilation clause"

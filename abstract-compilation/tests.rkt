@@ -12,8 +12,8 @@
   [(? symbol? x) (intern x)]
   [(? exact-integer? n) (intern n)]
   [=> (`(+ ,es ...) ρ)
-      (for/sum ([f ⟦es⟧]) (f ρ))
-      #:recur (es ...)]
+      (for/sum ([f ⟦e⟧s]) (f ρ))
+      #:recur [(es ...) #:as ⟦e⟧s]]
   [=> (`(- ,e) ρ)
       (- (⟦e⟧ ρ))
       #:recur e]
