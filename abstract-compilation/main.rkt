@@ -34,7 +34,7 @@
     (pattern [lhs:expr rhs:expr]
              #:attr gen (λ _ #`[lhs rhs]))
     (pattern [(~literal =>) p:expr execution:expr
-              (~optional (~seq #:wtehere [lhs:id rhs ...] ...)
+              (~optional (~seq #:where [lhs:id rhs ...] ...)
                          #:defaults ([(lhs 1) null]
                                      [(rhs 2) null]))
               (~optional (~seq #:recur q:pat ...)
