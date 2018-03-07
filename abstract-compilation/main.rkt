@@ -13,20 +13,13 @@
     #:description "pattern"
     #:attributes (gen)
     (pattern x:id
-             #:attr gen
-             (λ (⟦_⟧)
-               #`(define #,(format-id #'x "⟦~a⟧" #'x) (#,⟦_⟧ x))))
+             #:attr gen (λ (⟦_⟧) #`[#,(format-id #'x "⟦~a⟧" #'x) (#,⟦_⟧ x)]))
     (pattern (x:id (~literal ...))
-             #:attr gen
-             (λ (⟦_⟧)
-               #`(define #,(format-id #'x "⟦~a⟧" #'x) (map #,⟦_⟧ x))))
+             #:attr gen (λ (⟦_⟧) #`[#,(format-id #'x "⟦~a⟧" #'x) (map #,⟦_⟧ x)]))
     (pattern (x:id #:as y:id)
-             #:attr gen
-             (λ (⟦_⟧) #`(define y (#,⟦_⟧ x))))
+             #:attr gen (λ (⟦_⟧) #`[y (#,⟦_⟧ x)]))
     (pattern ((x:id (~literal ...)) #:as y:id)
-             #:attr gen
-             (λ (⟦_⟧)
-               #`(define y (map #,⟦_⟧ x)))))
+             #:attr gen (λ (⟦_⟧) #`[y (map #,⟦_⟧ x)])))
   
   (define-syntax-class clause
     #:description "compilation clause"
@@ -34,9 +27,9 @@
     (pattern [lhs:expr rhs:expr]
              #:attr gen (λ _ #`[lhs rhs]))
     (pattern [(~literal =>) p:expr execution:expr
-              (~optional (~seq #:where [lhs rhs ...] ...)
+              (~optional (~seq #:where [lhs rhs] ...)
                          #:defaults ([(lhs 1) null]
-                                     [(rhs 2) null]))
+                                     [(rhs 1) null]))
               (~optional (~seq #:recur q:pat ...)
                          #:defaults ([(q 1) null]))]
              #:attr gen
@@ -46,9 +39,9 @@
                                    (syntax->list #'(q ...)))]
                              [(components ...) comps])
                  #'[p
-                    (match-define lhs rhs ...) ...
-                    def-⟦q⟧ ...
-                    (λ (components ...) execution)])))))
+                    (let (def-⟦q⟧ ...)
+                      (match-let* ([lhs rhs] ...)
+                        (λ (components ...) execution)))])))))
 
 (define-syntax-parser define-compiler
   [(_ ((⟦_⟧:id e:id) components:id ...) clauses:clause ...)
