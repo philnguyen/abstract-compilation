@@ -34,7 +34,7 @@
     (pattern [lhs:expr rhs:expr]
              #:attr gen (λ _ #`[lhs rhs]))
     (pattern [(~literal =>) p:expr execution:expr
-              (~optional (~seq #:where [lhs:id rhs ...] ...)
+              (~optional (~seq #:where [lhs rhs ...] ...)
                          #:defaults ([(lhs 1) null]
                                      [(rhs 2) null]))
               (~optional (~seq #:recur q:pat ...)
@@ -46,7 +46,7 @@
                                    (syntax->list #'(q ...)))]
                              [(components ...) comps])
                  #'[p
-                    (define lhs rhs ...) ...
+                    (match-define lhs rhs ...) ...
                     def-⟦q⟧ ...
                     (λ (components ...) execution)])))))
 
